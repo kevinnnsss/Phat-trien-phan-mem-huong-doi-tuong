@@ -25,6 +25,8 @@ public class Event
         Capacity = capacity;
         IsOnline = isOnline;
     }
+    <summary>Tạo sự kiện mới.</summary>
+        <exception cref="ArgmentException">Tiêu đề trống hoặc sức chứa không dương,</exception>
     public static Event Create(Guid clubId, string title, DateTime date, int capacity, bool isOnl = false)
     {
         if (clubId == Guid.Empty)
