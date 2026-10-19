@@ -40,6 +40,7 @@ public class Club
     }
     // TODO: danh sách thành viên: field private List<Member> + property IReadOnlyList<Member> Members
     //       (bên ngoài không được .Add() trực tiếp — phải đi qua AddMember)
+    public int MemberCount() => _members.Count;
 
     // TODO: constructor PRIVATE + public static Club Create(string name, string description)
     // TODO: public void AddMember(Member member) — chặn null và thành viên trùng
