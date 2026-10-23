@@ -12,16 +12,16 @@ public class Club
 
     public string Description { get; private set; }
 
-    public DateTime CreateAT { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyList<Member> Members => _members;
 
     private Club(string name, string descriptio)
     {
         Id = Guid.NewGuid();
-        name = name;
+        Name = name;
         Description = descriptio;
-        CreateAT = DateTime.Now;
+        CreatedAt = DateTime.UtcNow;
     }
      public static Club Create(String name, string descriptio)
     {
@@ -34,7 +34,7 @@ public class Club
     {
         ArgumentNullException.ThrowIfNull(member);
         if (_members.Any(m => m.Id == member.Id))
-            throw new ArgumentException($"{member} đã là thành viên của {Name}");
+            throw new InvalidOperationException($"{member} đã là thành viên của {Name}");
 
         _members.Add(member);
     }
