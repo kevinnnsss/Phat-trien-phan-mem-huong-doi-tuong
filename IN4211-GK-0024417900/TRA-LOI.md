@@ -85,6 +85,13 @@ flowchart TD
 - Theo Clean Architecture và nguyên lý Đảo ngược phụ thuộc (DIP), **Domain** là tầng trung tâm cốt lõi chứa các thực thể và quy tắc nghiệp vụ quan trọng nhất (Enterprise Business Rules). Tầng này phải hoàn toàn độc lập với công nghệ bên ngoài, cơ sở dữ liệu, hay framework kỹ thuật.
 - Nếu `Domain` tham chiếu tới `Infrastructure`, nghiệp vụ sẽ bị phụ thuộc chặt (tight coupling) vào các công nghệ cụ thể của hạ tầng, làm mất tính độc lập, khó bảo trì, khó unit test và vi phạm chiều phụ thuộc hướng tâm của Clean Architecture. Chiều phụ thuộc luôn phải từ ngoài hướng vào trong: `Infrastructure` phụ thuộc vào `Domain`, không có chiều ngược lại.
 
+## Câu 5c
+### Minh chứng kiểm thử Swagger UI:
+- **Ảnh gọi POST /api/events thành công (201 Created):**
+  ![Swagger Success](MinhChung/swagger-success.png)
+- **Ảnh gọi POST /api/events thất bại với capacity <= 0 (400 Bad Request):**
+  ![Swagger Error](MinhChung/swagger-error.png)
+
 ## Câu 5d
 ### Giải thích lỗi AddScoped và cách khắc phục:
 - **Nguyên nhân:** Dịch vụ đăng ký dạng `AddScoped` chỉ tồn tại trong vòng đời của một HTTP Request. Khi gọi `POST`, một instance mới của `InMemoryEventRepository` được tạo ra, lưu dữ liệu vào `List<Event>` của instance đó rồi bị huỷ ngay khi request kết thúc. Khi gửi tiếp `GET`, ASP.NET Core tạo một instance hoàn toàn mới với một danh sách rỗng mới.

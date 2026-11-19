@@ -4,6 +4,8 @@ namespace EduHub.Infrastructure.Notifications;
 
 public class SmsNotificationService : INotificationService
 {
-    // TODO (Câu 3b):
-    // Hiện thực Send(string message): in ra Console (Console.WriteLine)
+    public void Send(string message)
+    {
+        Console.WriteLine($"[SMS SENT]: {message}");
+    }
 }

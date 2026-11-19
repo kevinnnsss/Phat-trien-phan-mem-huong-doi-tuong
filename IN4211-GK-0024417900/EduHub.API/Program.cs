@@ -15,6 +15,10 @@ builder.Services.AddSwaggerGen();
 // - IEventRepository -> InMemoryEventRepository (Lưu ý: đăng ký Singleton theo Câu 5d để tránh mất dữ liệu)
 // - INotificationFactory -> NotificationFactory
 // - EventService -> AddScoped
+// Đăng ký Singleton để không bị mất dữ liệu in-memory giữa các request (Câu 5d)
+builder.Services.AddSingleton<IEventRepository, InMemoryEventRepository>();
+builder.Services.AddSingleton<INotificationFactory, NotificationFactory>();
+builder.Services.AddScoped<EventService>();
 
 var app = builder.Build();
 
