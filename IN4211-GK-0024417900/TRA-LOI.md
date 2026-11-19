@@ -47,18 +47,50 @@ Số dòng vi phạm: Dòng 8, 12, 14.
 Giải thích: Lớp cấp cao (EventService) phụ thuộc trực tiếp vào các lớp cụ thể cấp thấp (SqlConnection, EmailSender, SmsSender) qua từ khoá new, thay vì phụ thuộc vào các Abstraction (interface).
 ## Câu 4b
 <!-- Phân biệt git merge và git rebase. Khi nào không nên dùng rebase? -->
+1. Phân biệt git merge và git rebase:
 
+git merge:
+Gộp các thay đổi từ nhánh khác vào nhánh hiện tại bằng cách tạo ra một commit gộp mới (merge commit) có hai commit cha.
+Ưu điểm: Giữ nguyên vẹn 100% lịch sử thực tế và cấu trúc rẽ nhánh của dự án, an toàn cho làm việc nhóm.
+Nhược điểm: Biểu đồ lịch sử (Git graph) có thể bị rối và nhiều nhánh chằng chịt nếu có nhiều người gộp code liên tục.
 
+git rebase:
+Lấy các commit của nhánh hiện tại và "nối tiếp" (chuyển gốc) vào đỉnh (tip) của nhánh đích.
+Ưu điểm: Viết lại lịch sử commit thành một đường thẳng tắp (linear history), sạch đẹp, dễ theo dõi tiến trình phát triển.
+Nhược điểm: Thay đổi mã băm (hash) của toàn bộ các commit được rebase, có nguy cơ làm mất ngữ cảnh thời gian thực tế.
+
+2. Khi nào không nên dùng rebase?
+
+Tuân theo "Quy tắc vàng của Rebase" (The Golden Rule of Rebase):
+Tuyệt đối không dùng git rebase trên các nhánh công khai / chia sẻ chung (public/shared branches như main, master, develop) nơi có nhiều người đang cùng kéo code về làm việc.
+Lý do: Rebase sẽ viết lại toàn bộ lịch sử commit (thay đổi commit hash). Nếu ai đó đã kéo nhánh này về trước đó, khi họ kéo lại sau rebase sẽ dẫn đến xung đột (conflict) nghiêm trọng và làm hỏng cây lịch sử Git của cả nhóm.
 ## Câu 5a
-<!-- Thiết lập tham chiếu giữa các project theo đúng chiều phụ thuộc của Clean Architecture bằng dotnet add reference.
-Vẽ sơ đồ bốn lớp và chiều phụ thuộc, ghi rõ lớp nào chứa Event, IEventRepository, EventService, InMemoryEventRepository, EventsController -->
+### Sơ đồ 4 lớp Clean Architecture và chiều phụ thuộc:
+```mermaid
+flowchart TD
+    API["EduHub.API (Presentation)<br/>Chứa: EventsController"]
+    Infra["EduHub.Infrastructure<br/>Chứa: InMemoryEventRepository"]
+    App["EduHub.Application<br/>Chứa: IEventRepository, EventService"]
+    Domain["EduHub.Domain (Core)<br/>Chứa: Event"]
 
+    API --> App
+    API --> Infra
+    Infra --> App
+    Infra --> Domain
+    App --> Domain
+```
 
 ## Câu 5b
-<!-- Giải thích vì sao project EduHub.Domain không được tham chiếu tới EduHub.Infrastructure -->
-
+### Vì sao EduHub.Domain không được tham chiếu tới EduHub.Infrastructure:
+- Theo Clean Architecture và nguyên lý Đảo ngược phụ thuộc (DIP), **Domain** là tầng trung tâm cốt lõi chứa các thực thể và quy tắc nghiệp vụ quan trọng nhất (Enterprise Business Rules). Tầng này phải hoàn toàn độc lập với công nghệ bên ngoài, cơ sở dữ liệu, hay framework kỹ thuật.
+- Nếu `Domain` tham chiếu tới `Infrastructure`, nghiệp vụ sẽ bị phụ thuộc chặt (tight coupling) vào các công nghệ cụ thể của hạ tầng, làm mất tính độc lập, khó bảo trì, khó unit test và vi phạm chiều phụ thuộc hướng tâm của Clean Architecture. Chiều phụ thuộc luôn phải từ ngoài hướng vào trong: `Infrastructure` phụ thuộc vào `Domain`, không có chiều ngược lại.
 
 ## Câu 5d
-<!-- Nếu đăng ký InMemoryEventRepository bằng AddScoped và bên trong lưu dữ liệu vào một List<Event> thông thường (không static), thì gọi POST thành công nhưng ngay sau đó gọi GET lại nhận danh sách rỗng.
-Giải thích nguyên nhân và ghi cách em đã đăng ký để tránh lỗi này -->
+### Giải thích lỗi AddScoped và cách khắc phục:
+- **Nguyên nhân:** Dịch vụ đăng ký dạng `AddScoped` chỉ tồn tại trong vòng đời của một HTTP Request. Khi gọi `POST`, một instance mới của `InMemoryEventRepository` được tạo ra, lưu dữ liệu vào `List<Event>` của instance đó rồi bị huỷ ngay khi request kết thúc. Khi gửi tiếp `GET`, ASP.NET Core tạo một instance hoàn toàn mới với một danh sách rỗng mới.
+- **Cách đăng ký để tránh lỗi:** Em đăng ký `InMemoryEventRepository` dưới dạng **Singleton** trong `Program.cs`:
+  ```csharp
+  builder.Services.AddSingleton<IEventRepository, InMemoryEventRepository>();
+  ```
+  Cách này đảm bảo duy nhất một instance repository được dùng chung cho tất cả các HTTP Request trong suốt vòng đời ứng dụng, giữ nguyên danh sách `_events`.
 
