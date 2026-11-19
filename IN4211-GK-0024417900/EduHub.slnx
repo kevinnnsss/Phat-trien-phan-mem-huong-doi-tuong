@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="TRA-LOI.md" />
+  </Folder>
+  <Project Path="EduHub.API/EduHub.API.csproj" />
+  <Project Path="EduHub.Application/EduHub.Application.csproj" />
+  <Project Path="EduHub.Domain/EduHub.Domain.csproj" />
+  <Project Path="EduHub.Infrastructure/EduHub.Infrastructure.csproj" />
+  <Project Path="EduHub.Tests/EduHub.Tests.csproj" />
+</Solution>
